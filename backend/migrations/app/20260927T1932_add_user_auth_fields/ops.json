@@ -1,0 +1,171 @@
+[
+  {
+    "id": "column.public.User.googleId",
+    "label": "Add column \"googleId\" to \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "googleId",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"googleId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "googleId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"googleId\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD COLUMN \"googleId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"googleId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "googleId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.User.resetToken",
+    "label": "Add column \"resetToken\" to \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resetToken",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resetToken\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "resetToken"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resetToken\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD COLUMN \"resetToken\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resetToken\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "resetToken"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.User.resetTokenExpiry",
+    "label": "Add column \"resetTokenExpiry\" to \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resetTokenExpiry",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resetTokenExpiry\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "resetTokenExpiry"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resetTokenExpiry\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD COLUMN \"resetTokenExpiry\" timestamp(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resetTokenExpiry\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "resetTokenExpiry"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.User.password",
+    "label": "Drop NOT NULL on \"User\".\"password\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "password",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"password\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"password\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ALTER COLUMN \"password\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"password\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "password",
+          "YES"
+        ]
+      }
+    ]
+  }
+]

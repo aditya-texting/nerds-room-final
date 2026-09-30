@@ -1,0 +1,1553 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "createNativeEnumType.EventStatus",
+    "label": "Create enum type \"EventStatus\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "EventStatus"
+      }
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "create enum type \"EventStatus\"",
+        "sql": "CREATE TYPE \"public\".\"EventStatus\" AS ENUM ('DRAFT', 'PUBLISH')",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "createNativeEnumType.EventType",
+    "label": "Create enum type \"EventType\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "EventType"
+      }
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "create enum type \"EventType\"",
+        "sql": "CREATE TYPE \"public\".\"EventType\" AS ENUM ('PUBLIC', 'PRIVATE')",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "createNativeEnumType.Role",
+    "label": "Create enum type \"Role\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "Role"
+      }
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "create enum type \"Role\"",
+        "sql": "CREATE TYPE \"public\".\"Role\" AS ENUM ('STUDENT', 'WORKING_PROFESSIONAL')",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "createNativeEnumType.TeamType",
+    "label": "Create enum type \"TeamType\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "TeamType"
+      }
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "create enum type \"TeamType\"",
+        "sql": "CREATE TYPE \"public\".\"TeamType\" AS ENUM ('INDIVIDUAL', 'TEAM', 'BOTH')",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.Admin",
+    "label": "Create table \"Admin\"",
+    "summary": "Creates table \"Admin\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Admin"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Admin\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Admin\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Admin\"",
+        "sql": "CREATE TABLE \"public\".\"Admin\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"password\" text NOT NULL,\n  \"updatedAt\" timestamp(3) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Admin\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Admin\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Event",
+    "label": "Create table \"Event\"",
+    "summary": "Creates table \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Event\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Event\"",
+        "sql": "CREATE TABLE \"public\".\"Event\" (\n  \"categoryId\" text,\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"creatorId\" text NOT NULL,\n  \"description\" text NOT NULL,\n  \"endDate\" timestamp(3) NOT NULL,\n  \"eventType\" \"EventType\" DEFAULT 'PUBLIC'::\"EventType\" NOT NULL,\n  \"id\" text NOT NULL,\n  \"isFeatured\" bool DEFAULT false NOT NULL,\n  \"location\" text,\n  \"locationUrl\" text,\n  \"maxTeamSize\" int4 DEFAULT 1 NOT NULL,\n  \"minTeamSize\" int4 DEFAULT 1 NOT NULL,\n  \"name\" text NOT NULL,\n  \"startDate\" timestamp(3) NOT NULL,\n  \"status\" \"EventStatus\" DEFAULT 'DRAFT'::\"EventStatus\" NOT NULL,\n  \"subtitle\" text,\n  \"teamType\" \"TeamType\" DEFAULT 'INDIVIDUAL'::\"TeamType\" NOT NULL,\n  \"updatedAt\" timestamp(3) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Event\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.EventCategory",
+    "label": "Create table \"EventCategory\"",
+    "summary": "Creates table \"EventCategory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "EventCategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"EventCategory\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventCategory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"EventCategory\"",
+        "sql": "CREATE TABLE \"public\".\"EventCategory\" (\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"EventCategory\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventCategory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.EventTimeline",
+    "label": "Create table \"EventTimeline\"",
+    "summary": "Creates table \"EventTimeline\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "EventTimeline"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"EventTimeline\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventTimeline\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"EventTimeline\"",
+        "sql": "CREATE TABLE \"public\".\"EventTimeline\" (\n  \"description\" text NOT NULL,\n  \"endDate\" timestamp(3) NOT NULL,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"startDate\" timestamp(3) NOT NULL,\n  \"title\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"EventTimeline\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventTimeline\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Faq",
+    "label": "Create table \"Faq\"",
+    "summary": "Creates table \"Faq\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Faq"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Faq\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Faq\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Faq\"",
+        "sql": "CREATE TABLE \"public\".\"Faq\" (\n  \"answer\" text NOT NULL,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"question\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Faq\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Faq\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ImportantLink",
+    "label": "Create table \"ImportantLink\"",
+    "summary": "Creates table \"ImportantLink\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ImportantLink"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ImportantLink\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ImportantLink\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ImportantLink\"",
+        "sql": "CREATE TABLE \"public\".\"ImportantLink\" (\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"title\" text NOT NULL,\n  \"url\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ImportantLink\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ImportantLink\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Partner",
+    "label": "Create table \"Partner\"",
+    "summary": "Creates table \"Partner\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Partner"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Partner\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Partner\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Partner\"",
+        "sql": "CREATE TABLE \"public\".\"Partner\" (\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"logoUrl\" text,\n  \"name\" text NOT NULL,\n  \"websiteUrl\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Partner\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Partner\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Prize",
+    "label": "Create table \"Prize\"",
+    "summary": "Creates table \"Prize\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Prize"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Prize\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Prize\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Prize\"",
+        "sql": "CREATE TABLE \"public\".\"Prize\" (\n  \"amount\" text,\n  \"description\" text,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"title\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Prize\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Prize\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Registration",
+    "label": "Create table \"Registration\"",
+    "summary": "Creates table \"Registration\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Registration"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Registration\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Registration\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Registration\"",
+        "sql": "CREATE TABLE \"public\".\"Registration\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Registration\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Registration\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Team",
+    "label": "Create table \"Team\"",
+    "summary": "Creates table \"Team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Team\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Team\"",
+        "sql": "CREATE TABLE \"public\".\"Team\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"inviteCode\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamp(3) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Team\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.TeamMember",
+    "label": "Create table \"TeamMember\"",
+    "summary": "Creates table \"TeamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "TeamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"TeamMember\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"TeamMember\"",
+        "sql": "CREATE TABLE \"public\".\"TeamMember\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"isLeader\" bool DEFAULT false NOT NULL,\n  \"teamId\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"TeamMember\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.TeamSubmission",
+    "label": "Create table \"TeamSubmission\"",
+    "summary": "Creates table \"TeamSubmission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "TeamSubmission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"TeamSubmission\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamSubmission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"TeamSubmission\"",
+        "sql": "CREATE TABLE \"public\".\"TeamSubmission\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"description\" text,\n  \"id\" text NOT NULL,\n  \"projectUrl\" text,\n  \"teamId\" text NOT NULL,\n  \"updatedAt\" timestamp(3) NOT NULL,\n  \"videoUrl\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"TeamSubmission\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamSubmission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Track",
+    "label": "Create table \"Track\"",
+    "summary": "Creates table \"Track\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Track"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Track\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Track\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Track\"",
+        "sql": "CREATE TABLE \"public\".\"Track\" (\n  \"description\" text,\n  \"eventId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"title\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Track\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Track\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.User",
+    "label": "Create table \"User\"",
+    "summary": "Creates table \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"User\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"User\"",
+        "sql": "CREATE TABLE \"public\".\"User\" (\n  \"city\" text,\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"github\" text,\n  \"id\" text NOT NULL,\n  \"linkedin\" text,\n  \"name\" text NOT NULL,\n  \"password\" text NOT NULL,\n  \"phone\" text,\n  \"role\" \"Role\" DEFAULT 'STUDENT'::\"Role\" NOT NULL,\n  \"updatedAt\" timestamp(3) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"User\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Admin.Admin_email_key",
+    "label": "Create index \"Admin_email_key\" on \"Admin\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Admin_email_key",
+        "table": "Admin"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Admin_email_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Admin_email_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Admin_email_key\"",
+        "sql": "CREATE UNIQUE INDEX \"Admin_email_key\" ON \"public\".\"Admin\" (\"email\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Admin_email_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Admin_email_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.EventCategory.EventCategory_name_key",
+    "label": "Create index \"EventCategory_name_key\" on \"EventCategory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EventCategory_name_key",
+        "table": "EventCategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EventCategory_name_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventCategory_name_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EventCategory_name_key\"",
+        "sql": "CREATE UNIQUE INDEX \"EventCategory_name_key\" ON \"public\".\"EventCategory\" (\"name\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EventCategory_name_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EventCategory_name_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Registration.Registration_userId_eventId_key",
+    "label": "Create index \"Registration_userId_eventId_key\" on \"Registration\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Registration_userId_eventId_key",
+        "table": "Registration"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Registration_userId_eventId_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Registration_userId_eventId_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Registration_userId_eventId_key\"",
+        "sql": "CREATE UNIQUE INDEX \"Registration_userId_eventId_key\" ON \"public\".\"Registration\" (\"userId\", \"eventId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Registration_userId_eventId_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Registration_userId_eventId_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Team.Team_inviteCode_key",
+    "label": "Create index \"Team_inviteCode_key\" on \"Team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Team_inviteCode_key",
+        "table": "Team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Team_inviteCode_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team_inviteCode_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Team_inviteCode_key\"",
+        "sql": "CREATE UNIQUE INDEX \"Team_inviteCode_key\" ON \"public\".\"Team\" (\"inviteCode\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Team_inviteCode_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team_inviteCode_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Team.Team_name_eventId_key",
+    "label": "Create index \"Team_name_eventId_key\" on \"Team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Team_name_eventId_key",
+        "table": "Team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Team_name_eventId_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team_name_eventId_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Team_name_eventId_key\"",
+        "sql": "CREATE UNIQUE INDEX \"Team_name_eventId_key\" ON \"public\".\"Team\" (\"name\", \"eventId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Team_name_eventId_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Team_name_eventId_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.TeamMember.TeamMember_teamId_userId_key",
+    "label": "Create index \"TeamMember_teamId_userId_key\" on \"TeamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "TeamMember_teamId_userId_key",
+        "table": "TeamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"TeamMember_teamId_userId_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamMember_teamId_userId_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"TeamMember_teamId_userId_key\"",
+        "sql": "CREATE UNIQUE INDEX \"TeamMember_teamId_userId_key\" ON \"public\".\"TeamMember\" (\"teamId\", \"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"TeamMember_teamId_userId_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamMember_teamId_userId_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.TeamSubmission.TeamSubmission_teamId_key",
+    "label": "Create index \"TeamSubmission_teamId_key\" on \"TeamSubmission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "TeamSubmission_teamId_key",
+        "table": "TeamSubmission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"TeamSubmission_teamId_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamSubmission_teamId_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"TeamSubmission_teamId_key\"",
+        "sql": "CREATE UNIQUE INDEX \"TeamSubmission_teamId_key\" ON \"public\".\"TeamSubmission\" (\"teamId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"TeamSubmission_teamId_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TeamSubmission_teamId_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.User.User_email_key",
+    "label": "Create index \"User_email_key\" on \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "User_email_key",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"User_email_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User_email_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"User_email_key\"",
+        "sql": "CREATE UNIQUE INDEX \"User_email_key\" ON \"public\".\"User\" (\"email\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"User_email_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User_email_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Event.Event_categoryId_fkey",
+    "label": "Add foreign key \"Event_categoryId_fkey\" on \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Event_categoryId_fkey",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Event_categoryId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Event_categoryId_fkey",
+          "public",
+          "\"public\".\"Event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Event_categoryId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Event\"\nADD CONSTRAINT \"Event_categoryId_fkey\"\nFOREIGN KEY (\"categoryId\")\nREFERENCES \"public\".\"EventCategory\" (\"id\")\nON DELETE SET NULL\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Event_categoryId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Event_categoryId_fkey",
+          "public",
+          "\"public\".\"Event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Event.Event_creatorId_fkey",
+    "label": "Add foreign key \"Event_creatorId_fkey\" on \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Event_creatorId_fkey",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Event_creatorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Event_creatorId_fkey",
+          "public",
+          "\"public\".\"Event\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Event_creatorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Event\"\nADD CONSTRAINT \"Event_creatorId_fkey\"\nFOREIGN KEY (\"creatorId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE RESTRICT\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Event_creatorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Event_creatorId_fkey",
+          "public",
+          "\"public\".\"Event\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EventTimeline.EventTimeline_eventId_fkey",
+    "label": "Add foreign key \"EventTimeline_eventId_fkey\" on \"EventTimeline\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EventTimeline_eventId_fkey",
+        "table": "EventTimeline"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EventTimeline_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EventTimeline_eventId_fkey",
+          "public",
+          "\"public\".\"EventTimeline\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EventTimeline_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EventTimeline\"\nADD CONSTRAINT \"EventTimeline_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EventTimeline_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EventTimeline_eventId_fkey",
+          "public",
+          "\"public\".\"EventTimeline\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Faq.Faq_eventId_fkey",
+    "label": "Add foreign key \"Faq_eventId_fkey\" on \"Faq\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Faq_eventId_fkey",
+        "table": "Faq"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Faq_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Faq_eventId_fkey",
+          "public",
+          "\"public\".\"Faq\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Faq_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Faq\"\nADD CONSTRAINT \"Faq_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Faq_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Faq_eventId_fkey",
+          "public",
+          "\"public\".\"Faq\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ImportantLink.ImportantLink_eventId_fkey",
+    "label": "Add foreign key \"ImportantLink_eventId_fkey\" on \"ImportantLink\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ImportantLink_eventId_fkey",
+        "table": "ImportantLink"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ImportantLink_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ImportantLink_eventId_fkey",
+          "public",
+          "\"public\".\"ImportantLink\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ImportantLink_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ImportantLink\"\nADD CONSTRAINT \"ImportantLink_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ImportantLink_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ImportantLink_eventId_fkey",
+          "public",
+          "\"public\".\"ImportantLink\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Partner.Partner_eventId_fkey",
+    "label": "Add foreign key \"Partner_eventId_fkey\" on \"Partner\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Partner_eventId_fkey",
+        "table": "Partner"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Partner_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Partner_eventId_fkey",
+          "public",
+          "\"public\".\"Partner\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Partner_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Partner\"\nADD CONSTRAINT \"Partner_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Partner_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Partner_eventId_fkey",
+          "public",
+          "\"public\".\"Partner\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Prize.Prize_eventId_fkey",
+    "label": "Add foreign key \"Prize_eventId_fkey\" on \"Prize\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Prize_eventId_fkey",
+        "table": "Prize"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Prize_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Prize_eventId_fkey",
+          "public",
+          "\"public\".\"Prize\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Prize_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Prize\"\nADD CONSTRAINT \"Prize_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Prize_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Prize_eventId_fkey",
+          "public",
+          "\"public\".\"Prize\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Registration.Registration_userId_fkey",
+    "label": "Add foreign key \"Registration_userId_fkey\" on \"Registration\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Registration_userId_fkey",
+        "table": "Registration"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Registration_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Registration_userId_fkey",
+          "public",
+          "\"public\".\"Registration\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Registration_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Registration\"\nADD CONSTRAINT \"Registration_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Registration_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Registration_userId_fkey",
+          "public",
+          "\"public\".\"Registration\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Registration.Registration_eventId_fkey",
+    "label": "Add foreign key \"Registration_eventId_fkey\" on \"Registration\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Registration_eventId_fkey",
+        "table": "Registration"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Registration_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Registration_eventId_fkey",
+          "public",
+          "\"public\".\"Registration\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Registration_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Registration\"\nADD CONSTRAINT \"Registration_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Registration_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Registration_eventId_fkey",
+          "public",
+          "\"public\".\"Registration\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Team.Team_eventId_fkey",
+    "label": "Add foreign key \"Team_eventId_fkey\" on \"Team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Team_eventId_fkey",
+        "table": "Team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Team_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Team_eventId_fkey",
+          "public",
+          "\"public\".\"Team\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Team_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Team\"\nADD CONSTRAINT \"Team_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Team_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Team_eventId_fkey",
+          "public",
+          "\"public\".\"Team\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TeamMember.TeamMember_teamId_fkey",
+    "label": "Add foreign key \"TeamMember_teamId_fkey\" on \"TeamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TeamMember_teamId_fkey",
+        "table": "TeamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TeamMember_teamId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamMember_teamId_fkey",
+          "public",
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TeamMember_teamId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TeamMember\"\nADD CONSTRAINT \"TeamMember_teamId_fkey\"\nFOREIGN KEY (\"teamId\")\nREFERENCES \"public\".\"Team\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TeamMember_teamId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamMember_teamId_fkey",
+          "public",
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TeamMember.TeamMember_userId_fkey",
+    "label": "Add foreign key \"TeamMember_userId_fkey\" on \"TeamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TeamMember_userId_fkey",
+        "table": "TeamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TeamMember_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamMember_userId_fkey",
+          "public",
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TeamMember_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TeamMember\"\nADD CONSTRAINT \"TeamMember_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TeamMember_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamMember_userId_fkey",
+          "public",
+          "\"public\".\"TeamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TeamSubmission.TeamSubmission_teamId_fkey",
+    "label": "Add foreign key \"TeamSubmission_teamId_fkey\" on \"TeamSubmission\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TeamSubmission_teamId_fkey",
+        "table": "TeamSubmission"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TeamSubmission_teamId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamSubmission_teamId_fkey",
+          "public",
+          "\"public\".\"TeamSubmission\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TeamSubmission_teamId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TeamSubmission\"\nADD CONSTRAINT \"TeamSubmission_teamId_fkey\"\nFOREIGN KEY (\"teamId\")\nREFERENCES \"public\".\"Team\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TeamSubmission_teamId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TeamSubmission_teamId_fkey",
+          "public",
+          "\"public\".\"TeamSubmission\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Track.Track_eventId_fkey",
+    "label": "Add foreign key \"Track_eventId_fkey\" on \"Track\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Track_eventId_fkey",
+        "table": "Track"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Track_eventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Track_eventId_fkey",
+          "public",
+          "\"public\".\"Track\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Track_eventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Track\"\nADD CONSTRAINT \"Track_eventId_fkey\"\nFOREIGN KEY (\"eventId\")\nREFERENCES \"public\".\"Event\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Track_eventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Track_eventId_fkey",
+          "public",
+          "\"public\".\"Track\""
+        ]
+      }
+    ]
+  }
+]

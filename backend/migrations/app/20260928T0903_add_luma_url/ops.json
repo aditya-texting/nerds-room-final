@@ -1,0 +1,372 @@
+[
+  {
+    "id": "createNativeEnumType.EventLocationType",
+    "label": "Create enum type \"EventLocationType\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "EventLocationType"
+      }
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "create enum type \"EventLocationType\"",
+        "sql": "CREATE TYPE \"public\".\"EventLocationType\" AS ENUM ('ONLINE', 'OFFLINE', 'HYBRID')",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "addNativeEnumValue.Role.ADMIN",
+    "label": "Add value \"ADMIN\" to enum type \"Role\"",
+    "summary": "Adds value \"ADMIN\" to enum type \"Role\". A newly added enum value cannot be used until the transaction that adds it commits, so a migration that both appends a value and uses it in the same step will fail at apply.",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "type",
+        "name": "Role"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure enum type \"Role\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_type\" AS \"t\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"t\".\"typnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"t\".\"typname\" = $2 AND \"t\".\"typtype\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Role",
+          "e"
+        ]
+      },
+      {
+        "description": "ensure value \"ADMIN\" is absent from enum type \"Role\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_enum\" AS \"e\" INNER JOIN \"pg_type\" AS \"t\" ON \"t\".\"oid\" = \"e\".\"enumtypid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"t\".\"typnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"t\".\"typname\" = $2 AND \"e\".\"enumlabel\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Role",
+          "ADMIN"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add value \"ADMIN\" to enum type \"Role\"",
+        "sql": "ALTER TYPE \"public\".\"Role\" ADD VALUE 'ADMIN'"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify value \"ADMIN\" exists on enum type \"Role\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_enum\" AS \"e\" INNER JOIN \"pg_type\" AS \"t\" ON \"t\".\"oid\" = \"e\".\"enumtypid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"t\".\"typnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"t\".\"typname\" = $2 AND \"e\".\"enumlabel\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Role",
+          "ADMIN"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Event.imageUrl",
+    "label": "Add column \"imageUrl\" to \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "imageUrl",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"imageUrl\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "imageUrl"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"imageUrl\"",
+        "sql": "ALTER TABLE \"public\".\"Event\" ADD COLUMN \"imageUrl\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"imageUrl\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "imageUrl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Event.locationType",
+    "label": "Add column \"locationType\" to \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "locationType",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"locationType\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "locationType"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"locationType\"",
+        "sql": "ALTER TABLE \"public\".\"Event\" ADD COLUMN \"locationType\" \"EventLocationType\" DEFAULT 'OFFLINE'::\"EventLocationType\" NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"locationType\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "locationType"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Event.lumaUrl",
+    "label": "Add column \"lumaUrl\" to \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "lumaUrl",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"lumaUrl\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "lumaUrl"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"lumaUrl\"",
+        "sql": "ALTER TABLE \"public\".\"Event\" ADD COLUMN \"lumaUrl\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"lumaUrl\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "lumaUrl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Event.slug",
+    "label": "Add column \"slug\" to \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "slug",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"slug\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "slug"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"slug\"",
+        "sql": "ALTER TABLE \"public\".\"Event\" ADD COLUMN \"slug\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"slug\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "slug"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.setNotNull.Event.slug",
+    "label": "Set NOT NULL on \"Event\".\"slug\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "slug",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"slug\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "slug"
+        ]
+      },
+      {
+        "description": "ensure no NULL values in \"slug\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"Event\" WHERE \"slug\" IS NULL) AS \"result\"",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "set NOT NULL on \"slug\"",
+        "sql": "ALTER TABLE \"public\".\"Event\" ALTER COLUMN \"slug\" SET NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"slug\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Event",
+          "slug",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "setDefault.User.role",
+    "label": "Set default on \"User\".\"role\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "role",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"role\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "role"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"role\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ALTER COLUMN \"role\" SET DEFAULT 'OTHER'"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"role\" has a default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "User",
+          "role"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Event.Event_slug_key",
+    "label": "Create index \"Event_slug_key\" on \"Event\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Event_slug_key",
+        "table": "Event"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Event_slug_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Event_slug_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Event_slug_key\"",
+        "sql": "CREATE UNIQUE INDEX \"Event_slug_key\" ON \"public\".\"Event\" (\"slug\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Event_slug_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Event_slug_key\""
+        ]
+      }
+    ]
+  }
+]

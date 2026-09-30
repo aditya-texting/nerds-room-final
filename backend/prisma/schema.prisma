@@ -1,0 +1,239 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  WORKING_PROFESSIONAL
+  OTHER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISH
+}
+
+enum EventType {
+  PUBLIC
+  PRIVATE
+}
+
+enum TeamType {
+  INDIVIDUAL
+  TEAM
+  BOTH
+}
+
+enum EventLocationType {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?
+  name      String
+  role      Role     @default(OTHER)
+  linkedin  String?
+  github    String?
+  city      String?
+  phone     String?
+  
+  googleId         String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  
+  // Relations
+  createdEvents Event[]        @relation("EventCreator")
+  registrations Registration[]
+  teamMembers   TeamMember[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  events          EventCategoryMapping[]
+}
+
+model EventCategoryMapping {
+  eventId    String
+  categoryId String
+  event      Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  category   EventCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, categoryId])
+}
+
+model Event {
+  id              String      @id @default(uuid())
+  slug            String      @unique
+  name            String
+  subtitle        String?
+  description     String
+  startDate       DateTime
+  endDate         DateTime
+  status          EventStatus @default(DRAFT)
+  isFeatured      Boolean     @default(false)
+  eventType       EventType   @default(PUBLIC)
+  locationType    EventLocationType @default(OFFLINE)
+  location        String?
+  locationUrl     String?
+  imageUrl        String?
+  lumaUrl         String?
+  
+  // Team constraints
+  teamType        TeamType    @default(INDIVIDUAL)
+  minTeamSize     Int         @default(1)
+  maxTeamSize     Int         @default(1)
+  
+  categoryMappings EventCategoryMapping[]
+  
+  creatorId       String
+  creator         User        @relation("EventCreator", fields: [creatorId], references: [id])
+  
+  // Relations
+  timelines       EventTimeline[]
+  importantLinks  ImportantLink[]
+  prizes          Prize[]
+  partners        Partner[]
+  tracks          Track[]
+  faqs            Faq[]
+  registrations   Registration[]
+  teams           Team[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model EventTimeline {
+  id          String   @id @default(uuid())
+  title       String?  
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ImportantLink {
+  id          String   @id @default(uuid())
+  title       String
+  url         String
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Prize {
+  id          String   @id @default(uuid())
+  title       String   // e.g., "1st Prize", "2nd Prize"
+  description String?
+  amount      String?  
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Partner {
+  id          String   @id @default(uuid())
+  name        String
+  logoUrl     String?
+  websiteUrl  String?
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Track {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Faq {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+// Registration model for individual participation or initial event signup
+model Registration {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, eventId]) // A user can only register once per event
+}
+
+// Teams for team-based events
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  inviteCode  String   @unique
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  members     TeamMember[]
+  submission  TeamSubmission?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([name, eventId]) // Team names should be unique per event
+}
+
+model TeamMember {
+  id          String   @id @default(uuid())
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isLeader    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+
+  @@unique([teamId, userId]) // User can only be in a team once
+}
+
+// Final submission by the team
+model TeamSubmission {
+  id          String   @id @default(uuid())
+  teamId      String   @unique // One submission per team
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  projectUrl  String?
+  videoUrl    String?
+  description String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
